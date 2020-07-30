@@ -1,0 +1,43 @@
+document
+html
+    head
+        title WebSample
+        style
+            include style.css
+        script(type='text/javascript').
+            function callToNative() {
+                try {
+                    var message = {
+                            action: 'open_fullpopup',
+                            param: {
+                                title: `${document.getElementById('formtitle').value}`,
+                                hookingUri: `${document.getElementById('formurl').value}`,
+                                loginUri: `${document.getElementById('formloginurl').value}`
+                            },
+                            callback: 'setCode'
+                        };
+                    if (window.android) {
+                        window.android.bridge(JSON.stringify(message));
+                    } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.bridge) {
+                        window.webkit.messageHandlers.bridge.postMessage(message);
+                    }
+                    
+                } catch(e) {
+                    console.log(e)
+                }
+            }
+            
+            function setCode(code) {
+                console.log(code)
+                alert('code is ' + code)
+            }
+    body
+        main#main
+            form(action='javascript:callToNative()')
+                p title: 
+                    input(type='text', id='formtitle', name='title', value='')
+                p url: 
+                    input(type='text', id='formurl',name='uri', value='')
+                p loginUrl: 
+                    input(type='text', id='formloginurl',name='loginUri', value='')
+                input(type='submit', value='Submit')
